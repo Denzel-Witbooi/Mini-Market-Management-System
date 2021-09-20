@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace Mini_Market_Management_System
 {
     public partial class LoginForm : Form
     {
+        DBConnect dBCon = new DBConnect();
         public LoginForm()
         {
             InitializeComponent();
@@ -51,6 +53,41 @@ namespace Mini_Market_Management_System
         {
             TextBox_username.Clear();
             TextBox_password.Clear();
+        }
+
+        private void Button_login_Click(object sender, EventArgs e)
+        {
+            if (comboBox_role.SelectedItem.ToString() == "ADMIN")
+            {
+                if (TextBox_username.Text == "Admin" || TextBox_password.Text == "Admin123")
+                {
+                    ProductForm product = new ProductForm();
+                    product.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show("If you are Admin, Please Enter the correct Id and Password","Missing Information",MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                string selectQuery = "SELECT * FROM Seller WHERE SellerName='" + TextBox_username.Text + "' AND SellerPass='" + TextBox_password.Text + "'";
+                
+                SqlDataAdapter adapter = new SqlDataAdapter(selectQuery,dBCon.GetCon());
+                DataTable table = new DataTable();
+                adapter.Fill(table);
+                if (table.Rows.Count > 0)
+                {
+                    SellingForm selling = new SellingForm();
+                    selling.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show("Wrong Username or password","Wrong Information",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }
